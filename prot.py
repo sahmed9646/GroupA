@@ -48,7 +48,7 @@ def isStringInt(str):
 ## -------------------------------------------------------------------------- ##
 
 def coloredText(text, color):
-    if (rgbSupport or color.r < 0 or color.g < 0 or color.b < 0):
+    if (rgbSupport and color.r >= 0 and color.g >= 0 and color.b >= 0):
         return "\033[38;2;" + str(color.r) + ";" + str(color.g) + ";" + str(color.b) + "m" + text + "\033[0m"
     return text
 
