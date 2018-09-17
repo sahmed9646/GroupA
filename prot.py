@@ -1,4 +1,5 @@
 import sys
+import os
 from enum import Enum
  
 ## -------------------------------------------------------------------------- ##
@@ -60,7 +61,7 @@ def consoleWrite(text):
 ## -------------------------------------------------------------------------- ##
 
 def consoleRead(text):
-    return input(text)
+    return input(text).lower()
 
 ## -------------------------------------------------------------------------- ##
 
@@ -88,6 +89,7 @@ def consoleReadInt(text, color, min, max, choices):
 ## -------------------------------------------------------------------------- ##
 
 def consoleReadAlts(text, color, choices):
+
     text = coloredText(text, color) + "\n"
 
     # Format message
@@ -130,6 +132,7 @@ class Tournament:
             self.setupType()
             self.setupPlayers()
             self.setupAI()
+            self.setupPlayerNames()
             self.summary()
             choice = consoleReadAlts(
                 "Is this setup ok?",
@@ -152,15 +155,16 @@ class Tournament:
         )
         if choice == "q":
             quitProgram()
-        self.type = TournamentType.ROUND_ROBIN if choice == "r" else TournamentType.KNOCKOUT
+        self.type = TournamentType.ROUND_ROBIN if (choice == "r" or choice == "R") else TournamentType.KNOCKOUT
 
     """
     """
     def setupPlayers(self):
         choice = consoleReadInt(
-            "How many players are participating in the tournament? (1 - 8)", CLEAR,
-            1, 8,
+            "How many players are participating in the tournament? (3 - 8)", CLEAR,
+            3, 8,
             [("q", "Quit", MAGENTA)]
+
         )
         if choice == "q":
             quitProgram()
@@ -169,6 +173,7 @@ class Tournament:
     """
     """
     def setupAI(self):
+       
         countChoice = consoleReadInt(
             "How many of those players are represented by AI? (0 - " + str(self.playerCount) + ")", CLEAR,
             0, self.playerCount,
@@ -181,7 +186,7 @@ class Tournament:
         difficulties = []
         for i in range(self.aiCount):
             difficultyChoice = consoleReadAlts(
-                "What difficulty should AI " + str(i) + " be?", CLEAR,
+                "What difficulty should AI " + str(i+1) + " be?", CLEAR,
                 [("e", "Easy", Color(136, 216, 176)), ("m", "Medium", Color(255, 204, 92)), ("h", "Hard", Color(255, 111, 105)), ("q", "Quit", MAGENTA)]
             )
             if difficultyChoice == "q":
@@ -189,16 +194,37 @@ class Tournament:
             difficulties.append(difficultyChoice)
         self.aiDifficulties = difficulties
 
+
     """
     """
+
+    def setupPlayerNames(self):
+        
+        playerNames = []
+        for i in range(self.playerCount - self.aiCount):
+            choice = consoleRead(
+                "Name of player #" + str(i+1) + "?\n"
+            )
+            if choice == "q":
+                quitProgram()
+            playerNames.append(choice)
+        self.playerNames = playerNames
+
+
+    """
+    """
+
+
     def summary(self):
         consoleWrite(
-            "Summary of tournament:\n" +
+            "\nSummary of tournament:\n" +
             "Type: " + ("Round-robin" if self.type == TournamentType.ROUND_ROBIN else "Knockout") + "\n" +
             "Player count: " + str(self.playerCount) + "\n" +
+            "Player names: " + str(self.playerNames) +"\n" +
             "AI count: " + str(self.aiCount) + "\n" + 
             "AI difficulty: " + str(expandDifficultyList(self.aiDifficulties))
         )
+    
 
 
     
@@ -209,6 +235,7 @@ class Tournament:
 """
 """
 def quitProgram():
+
     quit()
 
 ## -------------------------------------------------------------------------- ##
@@ -217,8 +244,9 @@ def quitProgram():
 Start the tournament manager
 """
 def tournamentManager():
+    os.system("clear")
     choice = consoleReadAlts(
-        "Welcome to the tournament manager!\n"
+        "Welcome to the tournament manager!\n\n"
         "What do you want to do?", CLEAR,
         [("c", "Create tournament", CLEAR), ("q", "Quit", MAGENTA)])
     if choice == "q":
