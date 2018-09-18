@@ -109,13 +109,20 @@ class TournamentDesc:
         playerCount = int(choice)
 
         # Setup player names
+        playerNames = []
         self.players = []
         for i in range(playerCount):
-            name = console.read("What is the name of player " + str(i + 1) + "?")
-            if name.lower() == "q":
-                quitProgram()
-            self.players.append(Player(name, PlayerDifficulty.HUMAN))          
-
+            validName = False
+            while not validName:
+                name = console.read("What is the name of player" + str(i + 1) + "? ")
+                if name.lower() == "q":
+                    quitProgram()
+                if name not in playerNames:
+                    self.players.append(Player(name, PlayerDifficulty.HUMAN))
+                    playerNames.append(name)
+                    validName = True
+                else:
+                    console.write("Name " + name + " is already taken. Please choose a new name")
 
     """
     """
@@ -138,10 +145,31 @@ class TournamentDesc:
         text = text + "Type: " + getTournamentTypeName(self.type) + "\n" + "Players:\n"
         for player in self.players:
             playerText = "\t" + player.name + " - " + getDifficultyName(player.difficulty) + "\n"
-            text = text + console.coloredText(playerText, console.RED)
+            text = text + console.coloredText(playerText, console.CLEAR)
 
         console.write(text)
 
+## -------------------------------------------------------------------------- ##
+## BracketKO class
+## -------------------------------------------------------------------------- ##
+
+"""
+Represents a bracket in a Knockout game. The two players are the ones that are competing. The result is represents the result of the bracket.
+
+Score:
+    -1 when the game has not yet been played and there is not result
+    0 when the first player suffered a loss
+    1 when the first player won
+    0.5 when the game tied
+"""
+class BracketKO:
+    def __init__(self, player0, player1):
+        self.player0 = player0
+        self.player1 = player1
+        self.result = -1
+
+    def setResult(self, result):
+        self.result = result
 
 ## -------------------------------------------------------------------------- ##
 ## Tournament class
@@ -158,7 +186,7 @@ class Tournament:
     Start the tournament
     """
     def start(self):
-        console.write("Starting tournament")
+        console.write("Starting tournament...")
         if self.desc.type == TournamentType.KNOCKOUT:
             self.startKO()
         else:
@@ -168,8 +196,65 @@ class Tournament:
     Start Knockout tournament
     """
     def startKO(self):
-        self.games = []
-        pass
+        # Randomize first bracket
+        freePlayers = self.desc.players
+        self.bracketsR0 = []
+        for i in range(4):
+            i = random.choice(list(range(len(freePlayers))))
+            player0 = freePlayers[i]
+            del freePlayers[i]
+            i = random.choice(list(range(len(freePlayers))))
+            player1 = freePlayers[i]
+            del freePlayers[i]            
+            self.bracketsR0.append(BracketKO(player0, player1))
+
+        # Play all 4 games
+        for b in self.bracketsR0:
+            # TODO(Filip): PLAY THE REAL GAME
+            console.write("Playing game (r0): " + b.player0.name + " vs " + b.player1.name)
+            b.setResult(playGameKO())
+
+            # TODO(Filip): HANDLE TIE
+            if b.result == 0.5:
+                b.setResult(1)
+
+        # Setup 2 new brackets
+        self.bracketsR1 = []
+        for i in range(2):
+            bracket0 = self.bracketsR0[i * 2]
+            bracket1 = self.bracketsR0[i * 2 + 1]
+            player0 = bracket0.player0 if bracket0.result == 1 else bracket0.player1
+            player1 = bracket1.player0 if bracket1.result == 1 else bracket1.player1
+            self.bracketsR1.append(BracketKO(player0, player1))
+
+        # Play both games
+        for b in self.bracketsR1:
+            # TODO(Filip): PLAY THE REAL GAME
+            console.write("Playing game (r1): " + b.player0.name + " vs " + b.player1.name)
+            b.setResult(playGameKO())
+
+            # TODO(Filip): HANDLE TIE
+            if b.result == 0.5:
+                b.setResult(1)
+
+        # Setup final brackets
+        player0 = self.bracketsR1[0].player0 if self.bracketsR1[0].result == 1 else self.bracketsR1[0].player1
+        player1 = self.bracketsR1[1].player0 if self.bracketsR1[1].result == 1 else self.bracketsR1[1].player1
+        self.bracketFinal = BracketKO(player0, player1)
+
+        # Play final
+        # TODO(Filip): PLAY THE REAL GAME
+        console.write("Playing game (final): " + self.bracketFinal.player0.name + " vs " + self.bracketFinal.player1.name)
+        self.bracketFinal.setResult(playGameKO())
+
+        # TODO(Filip): HANDLE TIE
+        if self.bracketFinal.result == 0.5:
+            self.bracketFinal.setResult(1)
+
+        # Present winner!
+        winner = self.bracketFinal.player0 if self.bracketFinal.result == 1 else self.bracketFinal.player1
+        console.write("Winner is: " + winner.name + "!")
+
 
     """
     Start Round-robin tournament
