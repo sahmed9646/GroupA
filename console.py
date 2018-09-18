@@ -139,6 +139,19 @@ Read user input from the terminal. The user is allowed to input one of the choic
 \param text The promt text to display to the user.
 \param color Color of the prompt text.
 \param choices List of available choices. This list contains one tuple for each choice. The first value in the tuple is the character that the user is allowed to input, the second value is the text for the choice and the third value is the color of the text for the choice.
+
+\example
+This example would prompt the user to make a choice between Blue, Green and quit. The made choice is returned from the call.
+
+choice = readAlts(
+    "Make a choice:", CLEAR, 
+    [
+        ("b", "Blue", BLUE),
+        ("g", "Green", GREEN),
+        ("q", "Quit", MAGENTA)
+    ]
+)
+
 """
 def readAlts(text, color, choices):
     return readInt(text, color, 1, 0, choices)
