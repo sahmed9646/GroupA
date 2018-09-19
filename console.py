@@ -1,4 +1,5 @@
 import sys
+import os
 
 ## -------------------------------------------------------------------------- ##
 ## Config variables
@@ -87,6 +88,13 @@ def coloredText(text, color):
 ## -------------------------------------------------------------------------- ##
 
 """
+"""
+def clear():
+    os.system("cls" if sys.platform == "win32" else "clear")
+
+## -------------------------------------------------------------------------- ##
+
+"""
 Write a set of text to the console.
 
 \param text Text that is written.
@@ -102,6 +110,7 @@ Read input from the console with the specified prompt text.
 \param text Prompt text.
 """
 def read(text):
+    clear()
     return input(text)
 
 ## -------------------------------------------------------------------------- ##
