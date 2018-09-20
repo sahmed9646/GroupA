@@ -23,8 +23,9 @@ class BracketKO:
 
     def setResult(self, result):
         self.result = result
-
-
+'''
+Class for printing colorful text
+'''
 class colorPrinter(object):
 
     def __init__(self):
@@ -54,7 +55,6 @@ class colorPrinter(object):
             sys.stdout.write(info)
             sys.stdout.flush()
             ctypes.windll.kernel32.SetConsoleTextAttribute(self.std_out_handle, self.Front_Colors_win['WHITE'])
-
 
 
 
@@ -100,6 +100,7 @@ def max_score_lens(score_matri, size):
 '''
 Class for Printing Table in RR mode
 '''
+
 class display_RR(object):
     '''
     Parameters:
