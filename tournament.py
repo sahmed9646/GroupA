@@ -299,17 +299,17 @@ class Tournament:
             if result == 1:
                 print("player: "  + i.player0.name + " won!")
                 i.player0.score += 1
-                print(i.player0.score)
+               # print(i.player0.score)
             elif result == 0.5:
                 print("Tie!")
                 i.player0.score += 0.5
                 i.player1.score += 0.5
-                print(i.player0.score)
-                print(i.player1.score)
+               # print(i.player0.score)
+               # print(i.player1.score)
             else:
                 print("player: " + i.player1.name + " won!")
                 i.player1.score += 1
-                print(i.player1.score)
+               # print(i.player1.score)
 
         
         player0.sort(key=lambda x: x.score, reverse=True)
@@ -321,19 +321,9 @@ class Tournament:
         else:
             winner = player0[1].name
 
-        print(winner + " WON U DUMB BIIITCH!")
+        print(winner + " WON with the score of " + winner.score " points!)
         
 
-
-        
-        
-
-
-
-
-
-
-        
         
     
 ## -------------------------------------------------------------------------- ##
