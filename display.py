@@ -319,9 +319,9 @@ class KO_displayer():
 
         if rounds_done > 1:
 
-            playername0 = self.Brackets[1][0].player0.name
+            playername0 = self.Brackets[2][0].player0.name
 
-            playername1 = self.Brackets[1][0].player1.name
+            playername1 = self.Brackets[2][0].player1.name
             sx = sx + hlength
             y0 = y_r3[0]
             y1 = y_r3[1]
