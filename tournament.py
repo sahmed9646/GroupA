@@ -118,7 +118,10 @@ class TournamentDesc:
                 if name.lower() == "q":
                     quitProgram()
                 if len(name) > 12:
-                    console.write("Name is too long. Please choose a shorter one")
+                    console.write("Name is too long. Please choose a shorter name")
+                    continue
+                if len(name) < 1:
+                    console.write("Name cannot be empty. Please choose another name")
                     continue
                 if name not in playerNames:
                     self.players.append(player.Player(name, player.PlayerDifficulty.HUMAN))
@@ -354,10 +357,12 @@ class Tournament:
 
         if player0[0].score > player1[0].score:
             winner = player0[0].name
+            score = player0[0].score
         else:
-            winner = player0[1].name
+            winner = player1[1].name
+            score = player1[1].score
 
-        print(winner + " WON with the score of " + winner.score + " points!")    
+        print(winner + " WON with the score of " + str(score) + " points!")    
     
 ## -------------------------------------------------------------------------- ##
 ## Tournament manager
