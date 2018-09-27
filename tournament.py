@@ -55,8 +55,14 @@ class TournamentDesc:
             for i in range(4):
                 p = player.Player(ordinalName(i) + "_P", player.PlayerDifficulty.HUMAN)
                 self.players.append(p)
-            for i in range(4):
-                a = player.Player(ordinalName(i) + "_A", player.PlayerDifficulty.MEDIUM)
+            for i in range(1):
+                a = player.Player(ordinalName(i) + "_A", player.PlayerDifficulty.EASY)
+                self.players.append(a)
+            for i in range(1):
+                a = player.Player(ordinalName(i + 1) + "_A", player.PlayerDifficulty.HARD)
+                self.players.append(a)
+            for i in range(2):
+                a = player.Player(ordinalName(i + 2) + "_A", player.PlayerDifficulty.MEDIUM)
                 self.players.append(a)
             return
 
@@ -108,9 +114,12 @@ class TournamentDesc:
         for i in range(playerCount):
             validName = False
             while not validName:
-                name = console.read("What is the name of the " + ordinalName(i) + " player? ")
+                name = console.read("What is the name of the " + ordinalName(i) + " player? (1-12 characters)", i == 0)
                 if name.lower() == "q":
                     quitProgram()
+                if len(name) > 12:
+                    console.write("Name is too long. Please choose a shorter one")
+                    continue
                 if name not in playerNames:
                     self.players.append(player.Player(name, player.PlayerDifficulty.HUMAN))
                     playerNames.append(name)
@@ -139,8 +148,8 @@ class TournamentDesc:
     def summary(self):
         text = "Summary of tournament:\n"
         text = text + "Type: " + getTournamentTypeName(self.type) + "\n" + "Players:\n"
-        for player in self.players:
-            playerText = "\t" + player.name + " - " + player.getDifficultyName(player.difficulty) + "\n"
+        for p in self.players:
+            playerText = "\t" + p.name + " - " + player.getDifficultyName(p.difficulty) + "\n"
             text = text + console.coloredText(playerText, console.CLEAR)
         return text
 
@@ -263,7 +272,7 @@ class Tournament:
             self.bracketsR1.append(createSubBracket(bracket0, bracket1))
 
         # Show brackets
-        console.write("") #console.clear() 
+        console.clear() 
         console.write("The brackets for the second round of Knockout are:")
         koDisp = display.KO_displayer([self.bracketsR0, self.bracketsR1])
         koDisp.draw_diagram(0, 1)
@@ -282,9 +291,9 @@ class Tournament:
         self.bracketFinal = createSubBracket(self.bracketsR1[0], self.bracketsR1[1])
 
         # Show brackets
-        console.write("") #console.clear() 
+        console.clear() 
         console.write("The bracket for the final round of Knockout is:")
-        koDisp = display.KO_displayer([self.bracketsR0, self.bracketsR1, [self.bracketFinal]])
+        koDisp = display.KO_displayer([self.bracketsR0, self.bracketsR1, self.bracketFinal])
         koDisp.draw_diagram(0, 1)
         koDisp.show()
 
@@ -298,9 +307,9 @@ class Tournament:
 
         # Show final result brackets
         winner = self.bracketFinal.player0 if self.bracketFinal.result == 1 else self.bracketFinal.player1
-        console.write("") #console.clear() 
+        console.clear() 
         console.write("The winner is " + winner.name)
-        koDisp = display.KO_displayer([self.bracketsR0, self.bracketsR1, [self.bracketFinal]], winner = winner)
+        koDisp = display.KO_displayer([self.bracketsR0, self.bracketsR1, self.bracketFinal], winner = winner)
         koDisp.draw_diagram(0, 1)
         koDisp.show()
 
@@ -384,6 +393,15 @@ def tournamentManager():
 Plays a random game and returns the score. This is either 1 for win of first player, 0.5 for tie and 0 for loss of first player
 """
 def playGame(player0, player1):
+    # Don't play if both players are AI
+    if player0.difficulty != player.PlayerDifficulty.HUMAN and player1.difficulty != player.PlayerDifficulty.HUMAN:
+        bag = []
+        for i in range(player0.difficulty.value[0]):
+            bag.append(1)
+        for i in range(player1.difficulty.value[0]):
+            bag.append(0)
+        return random.choice(bag)
+
     #console.write("Playing game: " + player0.name + " vs " + player1.name)
     return random.choice([0, 0.5, 1])
 

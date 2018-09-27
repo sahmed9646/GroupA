@@ -75,7 +75,7 @@ def playRPS(player0, player1):
     console.write(console.coloredText("[1] Rock", console.BLUE))
     console.write(console.coloredText("[2] Paper", console.GREEN))
     console.write(console.coloredText("[3] Scissor", console.RED))
-    console.write(console.coloredText("[q] Scissor", console.MAGENTA))
+    console.write(console.coloredText("[q] Quit", console.MAGENTA))
 
     # Let players0 make their choice
     if player0.difficulty == player.PlayerDifficulty.HUMAN:

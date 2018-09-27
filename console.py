@@ -114,8 +114,9 @@ Read input from the console with the specified prompt text.
 
 \param text Prompt text.
 """
-def read(text):
-    clear()
+def read(text, doClear=True):
+    if doClear:
+        clear()
     return input(text)
 
 ## -------------------------------------------------------------------------- ##

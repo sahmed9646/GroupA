@@ -8,14 +8,15 @@ from enum import Enum
 Player difficulty. Human players have the difficulty of 'HUMAN'.
 """
 class PlayerDifficulty(Enum):
-    """ Human player """
-    HUMAN = 1,
-    """ Easy AI """
-    EASY = 2,
+    """ Easy sAI """
+    EASY = 1,
     """ Medium AI """
-    MEDIUM = 3,
+    MEDIUM = 2,
     """ Hard AI """
-    HARD = 4
+    HARD = 3,
+    """ Human player """
+    HUMAN = 4
+    
 
 """
 """
