@@ -88,7 +88,7 @@ class TournamentDesc:
     def setupType(self):
         choice = console.readAlts(
             "Do you want the type of tournament to be Round-Robin or Knockout?", console.CLEAR,
-            [("r", "Round-robin", console.Color(250,128,114)), ("k", "Knockout", console.Color(102,205,170)), ("q", "Quit", console.MAGENTA)]
+            [("r", "Round-robin", 166), ("k", "Knockout", 26), ("q", "Quit", console.MAGENTA)]
         )
         if choice == "q":
             quitProgram()
@@ -139,7 +139,7 @@ class TournamentDesc:
         for i in range(aiCount):
             difficultyChoice = console.readAlts(
                 "What difficulty should the " + ordinalName(i) + " AI be at?", console.CLEAR,
-                [("e", "Easy", console.Color(136, 216, 176)), ("m", "Medium", console.Color(255, 204, 92)), ("h", "Hard", console.Color(255, 111, 105)), ("q", "Quit", console.MAGENTA)]
+                [("e", "Easy", 46), ("m", "Medium", 214), ("h", "Hard", 197), ("q", "Quit", console.MAGENTA)]
             )
             if difficultyChoice == "q":
                 quitProgram()
@@ -386,7 +386,7 @@ def tournamentManager():
     if choice == "q":
         quitProgram()
 
-    tDesc = TournamentDesc(True)
+    tDesc = TournamentDesc()
     t = Tournament(tDesc)
     t.start()
 

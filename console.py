@@ -29,34 +29,21 @@ def enableWinVT():
         kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)
 
 ## -------------------------------------------------------------------------- ##
-## Color class
-## -------------------------------------------------------------------------- ##
-
-"""
-Class that represents a color with R, G and B components. Used for terminal output.
-"""
-class Color:
-    def __init__(self, r, g, b):
-        self.r = r
-        self.g = g
-        self.b = b
-
-## -------------------------------------------------------------------------- ##
 ## Color constants
 ## -------------------------------------------------------------------------- ##
 
 """
 Special color that represents no color. This is used to disable any color formatting for output to the terminal.
 """
-CLEAR   = Color(-1, -1, -1)
+CLEAR   = -1
 
-RED     = Color(255, 0, 0)
-GREEN   = Color(0, 255, 0)
-BLUE    = Color(0, 0, 255)
+RED     = 9
+GREEN   = 10
+BLUE    = 12
 
-CYAN    = Color(0, 255, 255)
-MAGENTA = Color(255, 0, 255)
-YELLOW  = Color(255, 255, 0)
+CYAN    = 14
+MAGENTA = 13
+YELLOW  = 11
 
 ## -------------------------------------------------------------------------- ##
 ## Utility functions
@@ -86,8 +73,8 @@ Format a text with a color. The terminal needs to support ansi escape sequences 
 \param color Color to format the text with. 
 """
 def coloredText(text, color):
-    if (rgbSupport and color.r >= 0 and color.g >= 0 and color.b >= 0):
-        return "\033[38;2;" + str(color.r) + ";" + str(color.g) + ";" + str(color.b) + "m" + text + "\033[0m"
+    if (rgbSupport and color >= 0):
+        return "\033[38;5;" + str(color) + "m" + text + "\033[0m"
     return text
 
 ## -------------------------------------------------------------------------- ##
