@@ -1,18 +1,17 @@
-import random
-import os, sys, ctypes
+import console
+from console import coloredText
 
 ## -------------------------------------------------------------------------- ##
 ## Constant for windows I/O ops
 ## -------------------------------------------------------------------------- ##
 
-STD_INPUT_HANDLE = -10
-STD_OUTPUT_HANDLE = -11
-STD_ERROR_HANDLE = -12
 
-if os.name == 'posix':
-    colorCode = [ 'RED', 'GREEN', 'YELLOW', 'BLUE', 'PURPEL', 'DARK_GREEN', 'WHITE', 'BLACK',]
-else:
-    colorCode = ['RED', 'GREEN', 'YELLOW', 'BLUE', 'PINK', 'SKYBLUE', 'WHITE', 'GREY', ]
+
+colorCode = [ 'RED', 'GREEN', 'YELLOW', 'BLUE', 'MAGENTA', 'CYAN', 'WHITE', 'ORANGE',]
+Front_Colors = { 'RED': console.RED, 'GREEN': console.GREEN, 'YELLOW': console.YELLOW,
+                       'BLUE': console.BLUE, 'MAGENTA': console.MAGENTA,
+                       'CYAN': console.CYAN, 'WHITE': console.WHITE, 'ORANGE':console.ORANGE,
+                       }
 
 '''
 Class for printing colorful text
@@ -20,32 +19,11 @@ Class for printing colorful text
 class colorPrinter(object):
 
     def __init__(self):
-        self.Front_Colors = { 'RED': '\033[31m', 'GREEN': '\033[32m', 'YELLOW': '\033[33m',
-                       'BLUE': '\033[34m', 'PURPEL': '\033[35m',
-                       'DARK_GREEN': '\033[36m', 'WHITE': '\033[37m','BLACK': '\033[30m',
-                       }
+        pass
 
-        self.Front_Colors_win = {'RED': 0x0c, 'GREEN': 0x0a, 'YELLOW': 0x0e,
-                       'BLUE': 0x09 , 'PINK': 0x0d,
-                       'SKYBLUE': 0x0b, 'WHITE': 0x0f, 'GREY': 0x08}
-
-        self.Endc = '\033[0m'
-
-        if os.name == 'nt':
-            self.std_out_handle = ctypes.windll.kernel32.GetStdHandle(STD_OUTPUT_HANDLE)
-
-    if os.name == 'posix':
-        def __call__(self, info, color = 'WHITE', end = ''):
-            printStr = self.Front_Colors[color] + info + self.Endc
-            print(printStr, end=end)
-
-    else:
-        def __call__(self, info, color = 'WHITE', end = ''):
-            ctypes.windll.kernel32.SetConsoleTextAttribute(self.std_out_handle, self.Front_Colors_win[color])
-            info = info + end
-            sys.stdout.write(info)
-            sys.stdout.flush()
-            ctypes.windll.kernel32.SetConsoleTextAttribute(self.std_out_handle, self.Front_Colors_win['WHITE'])
+    def __call__(self, info, color = 'WHITE', end = ''):
+        colored_text = console.coloredText(info, Front_Colors[color])
+        print(colored_text, end=end)
 
 
 
@@ -92,7 +70,7 @@ def max_score_lens(score_matri, size):
 Class for Printing Table in RR mode
 '''
 
-class display_RR(object):
+class RR_displayer_M(object):
     '''
     Parameters:
         score_matri: M by M two-dim lists storing final scores in the competition , M is the number of the players
@@ -100,7 +78,7 @@ class display_RR(object):
         Player_num: number of all players including AI
         player_names: name of all players including AI
     '''
-    def __init__(self,scores_matri, player_num, player_names = None):
+    def __init__(self,scores_matri, player_names = None, player_num=8):
         self.player_num = player_num
         self.scores = scores_matri
         if player_names == None:
@@ -141,6 +119,121 @@ class display_RR(object):
                 display_score(self.scores[r][c], r, c)
                 pad_len = table_widths[c] - score_lens[r][c]
                 print(' ' * pad_len, end='')
+'''
+Class for Display Round-Robin results in a list style
+'''
+
+class RR_displayer_L():
+
+
+    def __init__(self, players):
+        #self.players = {player.name: player for player in players}
+        self.ranking = players
+        self.recordNum = 0
+        self.colorSetting = {player.name: Front_Colors[colorCode[i]] for i, player in enumerate(players)}
+        self.nameWidth = 12
+        self.scoreWidth = 5
+        self.indexWidth = 5
+        self.SpaceBetweenItems = 2 * ' '
+        self.recordLogger = 'Index' +  self.SpaceBetweenItems + 'PlayerA     ' + self.SpaceBetweenItems + 'PlayerB     ' + self.SpaceBetweenItems + 'Result\n'
+
+    def add_record(self, result, player0, player1):
+
+        record = ''
+        gameScore_0 = ''
+        gameScore_1 = ''
+        color_0 = self.colorSetting[player0.name]
+        color_1 = self.colorSetting[player1.name]
+        recordIndex = str(self.recordNum)
+        if result == 1:
+            player0.winCount += 1
+            player1.loseCount += 1
+            gameScore_0 = coloredText('1', color_0)
+            gameScore_1 = coloredText('0', color_1)
+
+        elif result == 0:
+            player1.winCount += 1
+            player0.loseCount += 1
+            gameScore_0 = coloredText('0', color_0)
+            gameScore_1 = coloredText('1', color_1)
+
+        elif result == 0.5:
+            player0.tieCount += 1
+            player1.tieCount += 1
+            gameScore_0 = coloredText('0', color_0)
+            gameScore_1 = coloredText('0', color_1)
+
+        record += recordIndex + (self.indexWidth - len(recordIndex)) * ' ' + self.SpaceBetweenItems
+        record += coloredText(player0.name, self.colorSetting[player0.name]) + ' ' * (self.nameWidth - len(player0.name)) +  self.SpaceBetweenItems
+        record += coloredText(player1.name, self.colorSetting[player1.name]) + ' ' * (self.nameWidth - len(player1.name)) + self.SpaceBetweenItems
+        record += gameScore_0 +  ' : ' +  gameScore_1 + '\n'
+        self.recordLogger += record
+        self.recordNum += 1
+
+    def printRecord(self):
+        print(self.recordLogger)
+
+    def printRanking(self):
+        self.ranking.sort(key=lambda x: (x.score, x.winCount), reverse=True)
+        rankPresent = 'Rank' + self.SpaceBetweenItems + 'Name        ' + self.SpaceBetweenItems + 'Win' + self.SpaceBetweenItems + 'Lose' + self.SpaceBetweenItems + 'Tie' + self.SpaceBetweenItems + 'Score\n'
+        for i, player in enumerate(self.ranking):
+            newLine = ''
+            rank = str(i)
+            newLine += str(i) + (4 - len(rank)) * ' ' + self.SpaceBetweenItems
+            newLine += coloredText(player.name, self.colorSetting[player.name]) + (12 - len(player.name)) * ' ' + self.SpaceBetweenItems
+            newLine += coloredText(str(player.winCount), 225) + (3 - len(str(player.winCount))) * ' ' + self.SpaceBetweenItems
+            newLine += coloredText(str(player.loseCount), 196) + (4 - len(str(player.loseCount))) * ' ' + self.SpaceBetweenItems
+            newLine += coloredText(str(player.tieCount), 190) + (3 - len(str(player.tieCount))) * ' ' + self.SpaceBetweenItems
+            newLine += coloredText(str(player.score), 99) + (5 - len(str(player.score))) * ' ' + '\n'
+            rankPresent += newLine
+        print(rankPresent)
+
+if __name__ == '__main__':
+
+    from player import Player, PlayerDifficulty
+    import itertools
+    from tournament import playGame, MatchRR
+
+    players = [Player('Gamer'+str(i), difficulty=PlayerDifficulty.HUMAN) for i in range(8)]
+    matches = []
+    allCombinations = list(itertools.combinations(players, 2))
+
+    player0 = [x[0] for x in allCombinations]
+    player1 = [x[1] for x in allCombinations]
+
+    for i in range(len(allCombinations)):
+        matches.append(MatchRR(player0[i], player1[i]))
+
+    console.write("Playing matches")
+
+    # Create RR_displayer Class
+    RR_Disp = RR_displayer_L(players)
+
+    for k,i in enumerate(matches):
+        result = playGame(i.player0, i.player1)
+        RR_Disp.add_record(result, i.player0, i.player1)
+
+        if result == 1:
+            print("player: " + i.player0.name + " won!")
+            i.player0.score += 1
+
+
+        elif result == 0.5:
+            print("Tie!")
+            i.player0.score += 0.5
+            i.player1.score += 0.5
+
+        else:
+            print("player: " + i.player1.name + " won!")
+            i.player1.score += 1
+
+        if (k + 1) % 7 == 0:
+            RR_Disp.printRecord()
+            RR_Disp.printRanking()
+
+    winner = RR_Disp.ranking[0]
+
+    print(winner.name + " WON with the score of " + str(winner.score) + " points!")
 
 ## -------------------------------------------------------------------------- ##
 ##    Utility Function for KO_displayer
@@ -173,14 +266,32 @@ class KO_displayer():
         Bracket_KO: list of Bracket_KO_Round_X list
         Usage: [Brackets_R0, ..., ], Brackets_RX is a list of Brackets in a round
     '''
-    def __init__(self, Brackets_KO = [], winner = None):
+    def __init__(self, firstBracket, sx=0, sy=0, hlength = 15, vlength=5, interval=3, name_blank = 2, line_colors = [0,1,2]):
         self.cx = 0
         self.cy = 0
-        self.Brackets = Brackets_KO
-        self.winner = winner
+        self.sx = sx
+        self.sy = sy
+        self.hlength = hlength
+        self.vlength = vlength
+        self.interval = interval
+        self.name_blank = name_blank
+        self.line_colors = line_colors
+        self.Brackets = firstBracket
+        self.stage = 0
         self.plot_pos = {}
+        self._buildTracker()
+        self._draw_diagram()
 
-    def draw_hline(self, y, x1, x2, char='-', color=0):
+    def _buildTracker(self):
+
+        self.playerList = []
+        for i in range(4):
+            player0 = self.Brackets[i].player0.name
+            player1 = self.Brackets[i].player1.name
+            self.playerList.append(player0)
+            self.playerList.append(player1)
+
+    def _draw_hline(self, y, x1, x2, char='-', color=0):
 
         if y in self.plot_pos.keys():
             self.plot_pos[y].append((x1, x2, char, color, 0))
@@ -190,7 +301,7 @@ class KO_displayer():
             self.plot_pos[y].append((x1, x2, char, color, 0))
 
 
-    def draw_vline(self, x, y1, y2, char='|', color=0):
+    def _draw_vline(self, x, y1, y2, char='|', color=0):
 
         for y in range(y1, y2):
 
@@ -201,7 +312,7 @@ class KO_displayer():
                 self.plot_pos[y] = []
                 self.plot_pos[y].append((x, x+1, char, color, 0))
 
-    def draw_name(self, sx, sy, playername, color):
+    def _draw_name(self, sx, sy, playername, color):
 
         if sy in self.plot_pos.keys():
             self.plot_pos[sy].append((sx, playername, color,  1))
@@ -262,77 +373,104 @@ class KO_displayer():
             self.cx = 0
             self.cy += 1
             print("")
-    '''
-    Plan the layout of the diagram
-    Parameter:
-            sx : x coordinate of the start position of the diagram
-            sy : y coordinate of the start position of the diagram
-            hlength : length of all the horizontal line in the diagram
-            vlength : length of all the vertical line in the diagram
-            interval : length of all the interval between brackets in the first round
-            name_blank: number of blanks between the '+' and the showing name
-            color: color codes for the three rounds
-    '''
-    def draw_diagram(self, sx, sy, hlength = 15, vlength=5, interval=3, name_blank = 2, colors = [0,1,2]):
+        #Back to  default
+        self.cx = 0
+        self.cy = 0
 
-        rounds_done = len(self.Brackets) - 1
+    def add_bracket(self, brackets):
+
+        self.stage += 1
+        self.Brackets = brackets
+        self._draw_diagram()
+
+    def add_winner(self, winner):
+
+        self.stage += 1
+        self.winner = winner
+        self._draw_diagram()
+
+    '''
+        Plan the layout of the diagram
+        Parameter:
+                sx : x coordinate of the start position of the diagram
+                sy : y coordinate of the start position of the diagram
+                hlength : length of all the horizontal line in the diagram
+                vlength : length of all the vertical line in the diagram
+                interval : length of all the interval between brackets in the first round
+                name_blank: number of blanks between the '+' and the showing name
+                color: color codes for the three rounds
+    '''
+
+    def _draw_diagram(self):
+
+        hlength = self.hlength
+        vlength = self.vlength
+        name_blank = self.name_blank
+        colors = self.line_colors
+        interval = self.interval
 
         #Draw 4 brackets in round 1
-        y_r2 = []
-        y_r3 = []
-        for i in range(4):
+        if self.stage == 0:
+            self.y_r2 = []
+            self.y_r3 = []
 
+            for i in range(4):
 
-            playername0 = self.Brackets[0][i].player0.name
+                playername0 = self.Brackets[i].player0.name
+                playername1 = self.Brackets[i].player1.name
+                color_player0 = self.playerList.index(playername0)
+                color_player1 = self.playerList.index(playername1)
 
-            playername1 = self.Brackets[0][i].player1.name
-
-            self.draw_hline(sy, sx, sx + hlength, color=colors[0])
-            self.draw_name(sx+hlength + name_blank, sy, playername0, color=2*i)
-            self.draw_name(sx + hlength + name_blank, sy + vlength - 1, playername1, color=(2*i + 1))
-            self.draw_vline(sx + hlength - 1, sy+1, sy + vlength -1, color=colors[0])
-            self.draw_hline(sy + vlength -1, sx, sx + hlength, color=colors[0])
-            self.draw_hline(sy + vlength//2, sx + hlength, sx + 2*hlength, color=colors[1])
-            y_r2.append(sy + vlength//2)
-            sy = sy + vlength + interval
+                self._draw_hline(self.sy, self.sx, self.sx + hlength, color=colors[0])
+                self._draw_name(self.sx+hlength + name_blank, self.sy, playername0, color=color_player0)
+                self._draw_name(self.sx + hlength + name_blank, self.sy + vlength - 1, playername1, color=color_player1)
+                self._draw_vline(self.sx + hlength - 1, self.sy+1, self.sy + vlength -1, color=colors[0])
+                self._draw_hline(self.sy + vlength -1, self.sx, self.sx + hlength, color=colors[0])
+                self._draw_hline(self.sy + vlength//2, self.sx + hlength, self.sx + 2*hlength, color=colors[1])
+                self.y_r2.append(self.sy + vlength//2)
+                self.sy = self.sy + vlength + interval
 
         # If in round 2 draw 2 more brackets
-        if rounds_done > 0:
+        elif self.stage == 1:
 
-            sx = sx + 2*hlength - 1
+            self.sx = self.sx + 2*hlength - 1
 
             for i in range(2):
 
-                playername0 = self.Brackets[1][i].player0.name
+                playername0 = self.Brackets[i].player0.name
+                playername1 = self.Brackets[i].player1.name
+                color_player0 = self.playerList.index(playername0)
+                color_player1 = self.playerList.index(playername1)
 
-                playername1 = self.Brackets[1][i].player1.name
-
-                y0 = y_r2[i*2]
-                y1 = y_r2[i*2+1]
-                y_r3.append((y0 + y1)//2)
-                self.draw_name(sx + name_blank + 1, y0, playername0, color = 2*i)
-                self.draw_name(sx + name_blank + 1, y1, playername1, color= (2 * i + 1))
-                self.draw_vline(sx, y0+1, y1, color=colors[1])
-                self.draw_hline(y_r3[-1], sx+1, sx + 1 + hlength, color=colors[2])
+                y0 = self.y_r2[i*2]
+                y1 = self.y_r2[i*2+1]
+                self.y_r3.append((y0 + y1)//2)
+                self._draw_name(self.sx + name_blank + 1, y0, playername0, color = color_player0)
+                self._draw_name(self.sx + name_blank + 1, y1, playername1, color= color_player1)
+                self._draw_vline(self.sx, y0+1, y1, color=colors[1])
+                self._draw_hline(self.y_r3[-1], self.sx+1, self.sx + 1 + hlength, color=colors[2])
 
         # If in final round draw one more brackets
 
-        if rounds_done > 1:
+        elif self.stage == 2:
 
-            playername0 = self.Brackets[2][0].player0.name
+            playername0 = self.Brackets.player0.name
+            playername1 = self.Brackets.player1.name
+            color_player0 = self.playerList.index(playername0)
+            color_player1 = self.playerList.index(playername1)
 
-            playername1 = self.Brackets[2][0].player1.name
-            sx = sx + hlength
-            y0 = y_r3[0]
-            y1 = y_r3[1]
-            sy = (y0 + y1) // 2
-            self.draw_name(sx + name_blank + 1, y0, playername0, color=0)
-            self.draw_name(sx + name_blank + 1, y1, playername1, color=1)
-            self.draw_vline(sx, y0+1, y1, color=colors[2])
-            self.draw_hline(sy, sx+1, sx + 1 + hlength, color=colors[2])
+            self.sx = self.sx + hlength
+            y0 = self.y_r3[0]
+            y1 = self.y_r3[1]
+            self.sy = (y0 + y1) // 2
+            self._draw_name(self.sx + name_blank + 1, y0, playername0, color=color_player0)
+            self._draw_name(self.sx + name_blank + 1, y1, playername1, color=color_player1)
+            self._draw_vline(self.sx, y0+1, y1, color=colors[2])
+            self._draw_hline(self.sy, self.sx+1, self.sx + 1 + hlength, color=colors[2])
 
         # Draw winner's name
-        if self.winner != None:
+        elif self.stage == 3:
 
-            sx = sx + hlength + 1
-            self.draw_name(sx + name_blank, sy, self.winner.name, color= 0)
+            winner_color = self.playerList.index(self.winner.name)
+            self.sx = self.sx + hlength + 1
+            self._draw_name(self.sx + name_blank, self.sy, self.winner.name, color= winner_color)

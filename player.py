@@ -37,3 +37,6 @@ class Player:
         self.score = 0
         self.blackCount = 0
         self.whiteCount = 0
+        self.winCount = 0
+        self.loseCount = 0
+        self.tieCount = 0

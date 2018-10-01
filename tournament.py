@@ -252,8 +252,7 @@ class Tournament:
         # Show brackets
         console.clear()
         console.write("The brackets for the first round of Knockout are:")
-        koDisp = display.KO_displayer([self.bracketsR0])
-        koDisp.draw_diagram(0, 1)
+        koDisp = display.KO_displayer(self.bracketsR0)
         koDisp.show()
 
         # Play first 4 games
@@ -277,10 +276,8 @@ class Tournament:
         # Show brackets
         console.clear() 
         console.write("The brackets for the second round of Knockout are:")
-        koDisp = display.KO_displayer([self.bracketsR0, self.bracketsR1])
-        koDisp.draw_diagram(0, 1)
+        koDisp.add_bracket(self.bracketsR1)
         koDisp.show()
-
         # Play both games
         for b in self.bracketsR1:
             # TODO(Filip): PLAY THE REAL GAME
@@ -296,8 +293,7 @@ class Tournament:
         # Show brackets
         console.clear() 
         console.write("The bracket for the final round of Knockout is:")
-        koDisp = display.KO_displayer([self.bracketsR0, self.bracketsR1, self.bracketFinal])
-        koDisp.draw_diagram(0, 1)
+        koDisp.add_bracket(self.bracketFinal)
         koDisp.show()
 
         # Play final
@@ -312,10 +308,8 @@ class Tournament:
         winner = self.bracketFinal.player0 if self.bracketFinal.result == 1 else self.bracketFinal.player1
         console.clear() 
         console.write("The winner is " + winner.name)
-        koDisp = display.KO_displayer([self.bracketsR0, self.bracketsR1, self.bracketFinal], winner = winner)
-        koDisp.draw_diagram(0, 1)
+        koDisp.add_winner(winner)
         koDisp.show()
-
     """
     Start Round-robin tournament
     """
@@ -332,37 +326,36 @@ class Tournament:
             self.matches.append(MatchRR(player0[i], player1[i]))
 
         console.write("Playing matches")
-        for i in self.matches:
-            result = playGame(i.player0, i.player1)
+
+        #Create RR_displayer Class
+        RR_Disp = display.RR_displayer_L(players)
+
+        for i, m in enumerate(self.matches):
+            result = playGame(m.player0, m.player1)
+            RR_Disp.add_record(result, m.player0, m.player1)
 
             if result == 1:
-                print("player: "  + i.player0.name + " won!")
-                i.player0.score += 1
-               # print(i.player0.score)
+                print("player: " + m.player0.name + " won!")
+                m.player0.score += 1
+
+
             elif result == 0.5:
                 print("Tie!")
-                i.player0.score += 0.5
-                i.player1.score += 0.5
-               # print(i.player0.score)
-               # print(i.player1.score)
+                m.player0.score += 0.5
+                m.player1.score += 0.5
+
             else:
-                print("player: " + i.player1.name + " won!")
-                i.player1.score += 1
-               # print(i.player1.score)
+                print("player: " + m.player1.name + " won!")
+                m.player1.score += 1
+
+            if (i + 1) % 7 == 0:
+                RR_Disp.printRecord()
+                RR_Disp.printRanking()
 
         
-        player0.sort(key=lambda x: x.score, reverse=True)
-        player1.sort(key=lambda x: x.score, reverse=True)
-    
+        winner =  RR_Disp.ranking[0]
 
-        if player0[0].score > player1[0].score:
-            winner = player0[0].name
-            score = player0[0].score
-        else:
-            winner = player1[1].name
-            score = player1[1].score
-
-        print(winner + " WON with the score of " + str(score) + " points!")    
+        print(winner.name + " WON with the score of " + str(winner.score) + " points!")
     
 ## -------------------------------------------------------------------------- ##
 ## Tournament manager
@@ -413,5 +406,5 @@ def playGame(player0, player1):
 ## -------------------------------------------------------------------------- ##
 ## Demo driver
 ## -------------------------------------------------------------------------- ##
-
-tournamentManager()
+if __name__ == '__main__':
+    tournamentManager()
