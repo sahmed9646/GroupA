@@ -37,14 +37,14 @@ Special color that represents no color. This is used to disable any color format
 """
 CLEAR   = -1
 
-RED     = 9
-GREEN   = 10
-BLUE    = 12
+RED     = 160
+GREEN   = 46
+BLUE    = 27
 
-CYAN    = 14
-MAGENTA = 13
-YELLOW  = 11
-WHITE = 15
+CYAN    = 51
+MAGENTA = 99
+YELLOW  = 226
+WHITE = 231
 ORANGE = 208
 
 ## -------------------------------------------------------------------------- ##

@@ -14,8 +14,8 @@ import rps
 ## -------------------------------------------------------------------------- ##
 
 def ordinalName(number):
-    if (number <= 8):
-        ordinals = ["first", "second", "third", "fourth", "fifth", "sixth", "eight"]
+    if (number < 8):
+        ordinals = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eight"]
         return ordinals[number]
     else:
         return str(number) + "th"
