@@ -1,7 +1,6 @@
 # Standard imports
 import sys
 import random
-import itertools
 from enum import Enum
 
 # Project imports
@@ -316,41 +315,58 @@ class Tournament:
     def startRR(self):
         # Get all combinations for the players/AI. nCr = 28 different combinations
         players = self.desc.players #all players
-        self.matches = []
-        allCombinations = list(itertools.combinations(players, 2))
-       
-        player0 = [x[0] for x in allCombinations]
-        player1 = [x[1] for x in allCombinations]
 
-        for i in range(len(allCombinations)):
-            self.matches.append(MatchRR(player0[i], player1[i]))
-
-        console.write("Playing matches")
-
-        #Create RR_displayer Class
         RR_Disp = display.RR_displayer_L(players)
 
-        for i, m in enumerate(self.matches):
-            result = playGame(m.player0, m.player1)
-            RR_Disp.add_record(result, m.player0, m.player1)
+        for i in range(7):
+            Matches = []
+            Moving =players[0]
 
-            if result == 1:
-                print("player: " + m.player0.name + " won!")
-                m.player0.score += 1
+            for j in range(7):
+                posMoveTo = (j+1) % 7
+                nextToMove = players[posMoveTo]
+                players[posMoveTo]= Moving
+                Moving = nextToMove
+
+            print('Round' + str(i) + ' Schedule:')
+
+            for k in range(3):
+                player0 = players[k]
+                player1 = players[6-k]
+                matchText = console.coloredText(player0.name, RR_Disp.colorSetting[player0.name]) + ' Vs ' + console.coloredText(player1.name, RR_Disp.colorSetting[player1.name])
+                Matches.append(MatchRR(player0, player1))
+                print(matchText)
+
+            player0 = players[3]
+            player1 = players[7]
+            Matches.append(MatchRR(player0, player1))
+            matchText = console.coloredText(player0.name,RR_Disp.colorSetting[player0.name]) + ' Vs ' + console.coloredText(player1.name, RR_Disp.colorSetting[player1.name])
+            Matches.append(MatchRR(player0, player1))
+            print(matchText)
 
 
-            elif result == 0.5:
-                print("Tie!")
-                m.player0.score += 0.5
-                m.player1.score += 0.5
+            for m in Matches:
 
-            else:
-                print("player: " + m.player1.name + " won!")
-                m.player1.score += 1
+                result = playGame(m.player0, m.player1)
+                RR_Disp.add_record(result, m.player0, m.player1)
 
-            if (i + 1) % 7 == 0:
-                RR_Disp.printRecord()
-                RR_Disp.printRanking()
+                if result == 1:
+                    print("player: " + m.player0.name + " won!")
+                    m.player0.score += 1
+
+
+                elif result == 0.5:
+                    print("Tie!")
+                    m.player0.score += 0.5
+                    m.player1.score += 0.5
+
+                else:
+                    print("player: " + m.player1.name + " won!")
+                    m.player1.score += 1
+
+
+            RR_Disp.printRecord()
+            RR_Disp.printRanking()
 
         
         winner =  RR_Disp.ranking[0]
