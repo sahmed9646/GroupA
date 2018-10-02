@@ -223,7 +223,6 @@ if __name__ == '__main__':
                                         RR_Disp.colorSetting[player0.name]) + ' Vs ' + console.coloredText(player1.name,
                                                                                                            RR_Disp.colorSetting[
                                                                                                                player1.name])
-        Matches.append(MatchRR(player0, player1))
         print(matchText)
 
         for m in Matches:

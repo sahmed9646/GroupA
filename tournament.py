@@ -341,7 +341,6 @@ class Tournament:
             player1 = players[7]
             Matches.append(MatchRR(player0, player1))
             matchText = console.coloredText(player0.name,RR_Disp.colorSetting[player0.name]) + ' Vs ' + console.coloredText(player1.name, RR_Disp.colorSetting[player1.name])
-            Matches.append(MatchRR(player0, player1))
             print(matchText)
 
 
@@ -364,7 +363,7 @@ class Tournament:
                     print("player: " + m.player1.name + " won!")
                     m.player1.score += 1
 
-
+            
             RR_Disp.printRecord()
             RR_Disp.printRanking()
 
