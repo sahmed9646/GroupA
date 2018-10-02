@@ -2,6 +2,7 @@ import unittest
 
 # Project imports
 import tournament
+import player
 
 ## -------------------------------------------------------------------------- ##
 ## Test classes
@@ -23,6 +24,17 @@ class TestRPS(unittest.TestCase):
     def test_something(self):
         pass
 
+
+"""
+Player tests
+"""
+class TestPlayer(unittest.TestCase):
+    def test_player(self):
+        testplayer = player.Player("Zlatan", 4)
+        self.assertTrue(testplayer.difficulty == 4)
+        self.assertEqual(testplayer.name, "Zlatan")
+        self.assertEqual(testplayer.score, 0)
+    
 ## -------------------------------------------------------------------------- ##
 ## Test runner
 ## -------------------------------------------------------------------------- ##
