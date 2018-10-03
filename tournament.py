@@ -13,12 +13,17 @@ import rps
 ## Utility functions
 ## -------------------------------------------------------------------------- ##
 
+"""
+Return the ordinal name of the input number + 1. 0 = first, 1 = second and so on. When the number reaches 9 the result will be the number - 1 with a "th" appended. 
+
+So for example if number is 999 then result is 1000th
+"""
 def ordinalName(number):
     if (number < 8):
         ordinals = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eight"]
         return ordinals[number]
     else:
-        return str(number) + "th"
+        return str(number + 1) + "th"
 
 ## -------------------------------------------------------------------------- ##
 ## Tournament type enumeration
@@ -399,21 +404,50 @@ def tournamentManager():
     t.start()
 
 ## -------------------------------------------------------------------------- ##
-## Mock functions
+## Playing games
+## -------------------------------------------------------------------------- ##
+
+"""
+Translation of the result from the platform layer to the tournament-manager layer
+"""
+def platformToTournamentResult(result):
+    if result == 0:
+        return 0.5
+    elif result == 1:
+        return 1
+    elif  result == 2:
+        return 0
+    return result
+
 ## -------------------------------------------------------------------------- ##
 
 """
 Plays a random game and returns the score. This is either 1 for win of first player, 0.5 for tie and 0 for loss of first player
 """
 def playGame(player0, player1):
+    result = -1
+
     # Don't play if both players are AI
-    if player0.difficulty != player.PlayerDifficulty.HUMAN and player1.difficulty != player.PlayerDifficulty.HUMAN:
+    if player0.isAI() and player1.isAI():
         bag = []
         for i in range(player0.difficulty.value[0]):
             bag.append(1)
         for i in range(player1.difficulty.value[0]):
             bag.append(0)
-        return random.choice(bag)
+        result = random.choice(bag)
+
+    elif player0.isAI():
+        pass
+        #result = startGame(True, player0.difficulty.value[0])
+        #result = 1.0 - platformToTournamentResult(result)
+    elif player1.isAI():
+        pass
+        #result = startGame(True, player1.difficulty.value[0])
+        #result = platformToTournamentResult(result)
+    else:
+        pass
+        #result = startGame(False, 0)
+        #result = platformToTournamentResult(result)
 
     #console.write("Playing game: " + player0.name + " vs " + player1.name)
     return random.choice([0, 0.5, 1])

@@ -40,3 +40,6 @@ class Player:
         self.winCount = 0
         self.loseCount = 0
         self.tieCount = 0
+
+    def isAI(self):
+        return self.difficulty != PlayerDifficulty.HUMAN
