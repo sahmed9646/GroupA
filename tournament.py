@@ -449,6 +449,10 @@ def playGame(player0, player1):
         #result = startGame(False, 0)
         #result = platformToTournamentResult(result)
 
+    # Quit program is result is -1
+    if result == -1:
+        quitProgram()
+
     #console.write("Playing game: " + player0.name + " vs " + player1.name)
     return random.choice([0, 0.5, 1])
 
