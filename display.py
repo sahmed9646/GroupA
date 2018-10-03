@@ -192,7 +192,7 @@ class RR_displayer_L():
         for i, player in enumerate(self.ranking):
             newLine = ''
             rank = str(i+1)
-            newLine += str(i) + (4 - len(rank)) * ' ' + self.SpaceBetweenItems
+            newLine += rank + (4 - len(rank)) * ' ' + self.SpaceBetweenItems
             newLine += coloredText(player.name, self.colorSetting[player.name]) + (12 - len(player.name)) * ' ' + self.SpaceBetweenItems
             newLine += coloredText(str(player.winCount), 225) + (3 - len(str(player.winCount))) * ' ' + self.SpaceBetweenItems
             newLine += coloredText(str(player.loseCount), 196) + (4 - len(str(player.loseCount))) * ' ' + self.SpaceBetweenItems
