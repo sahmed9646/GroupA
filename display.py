@@ -1,6 +1,6 @@
 import console
 from console import coloredText
-
+import copy
 ## -------------------------------------------------------------------------- ##
 ## Constant for windows I/O ops
 ## -------------------------------------------------------------------------- ##
@@ -127,56 +127,71 @@ class RR_displayer_L():
 
 
     def __init__(self, players):
-        #self.players = {player.name: player for player in players}
-        self.ranking = players
-        self.recordNum = 0
+
+        self.ranking = players.copy()
+        self.round = 0
+        self.matchIndex = 0
         self.colorSetting = {player.name: Front_Colors[colorCode[i]] for i, player in enumerate(players)}
-        self.nameWidth = 12
-        self.scoreWidth = 5
-        self.indexWidth = 5
+        playersSortedByNameLen = sorted(players, key=lambda x:len(x.name), reverse=True)
+        self.namesLen = len(playersSortedByNameLen[0].name) + len(playersSortedByNameLen[1].name) + len('-')
+        self.scoreLen = 3
+        self.blanksAside = 2
+        self.blanksBetween = 1
+        self.columnLen = self.namesLen + self.blanksAside + self.blanksBetween + self.scoreLen
+        self.BlanksBeforeRoundName = (self.columnLen - 7) // 2
+        self.BlanksAfterRoundName = self.columnLen - 7 - self.BlanksBeforeRoundName
+        self.rows = [['|' for _ in range(5)] for _ in range(2)]
+        self.rows[0][0] = ''
+        self.rows[1][0] = ''
         self.SpaceBetweenItems = 2 * ' '
-        self.recordLogger = 'Index' +  self.SpaceBetweenItems + 'PlayerA     ' + self.SpaceBetweenItems + 'PlayerB     ' + self.SpaceBetweenItems + 'Result\n'
 
     def add_record(self, result, player0, player1):
 
-        record = ''
-        winner =None
-        recordIndex = str(self.recordNum)
+        if self.matchIndex == 0:
+            self.round += 1
+            self.rows[self.round//5][0] += ' ' + self.BlanksBeforeRoundName * ' ' + coloredText('Round '+str(self.round), Front_Colors[colorCode[self.round-1]] ) + ' ' * self.BlanksAfterRoundName + ' '
+
+        record = ' ' + coloredText(player0.name, self.colorSetting[player0.name]) + '-' + coloredText(player1.name, self.colorSetting[player1.name]) + ' '
+        BlanksToAdd = ' ' * (self.namesLen - len(player0.name) - len(player1.name))
+        record += BlanksToAdd
+
         if result == 1:
             player0.winCount += 1
             player1.loseCount += 1
-            winner = 'PlayerA'
+            record += '1:0'
+
 
         elif result == 0:
             player1.winCount += 1
             player0.loseCount += 1
-            winner = 'PlayerB'
+            record += '0:1'
 
         elif result == 0.5:
             player0.tieCount += 1
             player1.tieCount += 1
-            winner = ''
+            record += '0:0'
 
-        if self.recordNum % 4 == 0:
-            record += 'Round' + str(self.recordNum // 4) + ':\n'
+        record += ' |'
+        self.rows[self.round//5][self.matchIndex+1] += record
+        self.matchIndex = (self.matchIndex+1) % 4
 
-
-        record += recordIndex + (self.indexWidth - len(recordIndex)) * ' ' + self.SpaceBetweenItems
-        record += coloredText(player0.name, self.colorSetting[player0.name]) + ' ' * (self.nameWidth - len(player0.name)) +  self.SpaceBetweenItems
-        record += coloredText(player1.name, self.colorSetting[player1.name]) + ' ' * (self.nameWidth - len(player1.name)) + self.SpaceBetweenItems
-        record += winner + ('  Won' if result != 0.5 else 'Tie') + '\n'
-        self.recordLogger += record
-        self.recordNum += 1
 
     def printRecord(self):
-        print(self.recordLogger)
+        for text in self.rows[0]:
+            print(text)
+
+        if self.round > 4:
+            print("")
+            for text in self.rows[1]:
+                print(text)
+
 
     def printRanking(self):
         self.ranking.sort(key=lambda x: (x.score, x.winCount), reverse=True)
         rankPresent = 'Rank' + self.SpaceBetweenItems + 'Name        ' + self.SpaceBetweenItems + 'Win' + self.SpaceBetweenItems + 'Lose' + self.SpaceBetweenItems + 'Tie' + self.SpaceBetweenItems + 'Score\n'
         for i, player in enumerate(self.ranking):
             newLine = ''
-            rank = str(i)
+            rank = str(i+1)
             newLine += str(i) + (4 - len(rank)) * ' ' + self.SpaceBetweenItems
             newLine += coloredText(player.name, self.colorSetting[player.name]) + (12 - len(player.name)) * ' ' + self.SpaceBetweenItems
             newLine += coloredText(str(player.winCount), 225) + (3 - len(str(player.winCount))) * ' ' + self.SpaceBetweenItems
@@ -186,70 +201,7 @@ class RR_displayer_L():
             rankPresent += newLine
         print(rankPresent)
 
-if __name__ == '__main__':
 
-    from player import Player, PlayerDifficulty
-    from tournament import playGame, MatchRR
-
-    players = [Player('Gamer'+str(i), difficulty=PlayerDifficulty.HUMAN) for i in range(8)]
-
-    RR_Disp = RR_displayer_L(players)
-
-    for i in range(7):
-        Matches = []
-        Moving = players[0]
-
-        for j in range(7):
-            posMoveTo = (j + 1) % 7
-            nextToMove = players[posMoveTo]
-            players[posMoveTo] = Moving
-            Moving = nextToMove
-
-        print('Round' + str(i) + ' Schedule:')
-
-        for k in range(3):
-            player0 = players[k]
-            player1 = players[6 - k]
-            matchText = console.coloredText(player0.name,
-                                            RR_Disp.colorSetting[player0.name]) + ' Vs ' + console.coloredText(
-                player1.name, RR_Disp.colorSetting[player1.name])
-            Matches.append(MatchRR(player0, player1))
-            print(matchText)
-
-        player0 = players[3]
-        player1 = players[7]
-        Matches.append(MatchRR(player0, player1))
-        matchText = console.coloredText(player0.name,
-                                        RR_Disp.colorSetting[player0.name]) + ' Vs ' + console.coloredText(player1.name,
-                                                                                                           RR_Disp.colorSetting[
-                                                                                                               player1.name])
-        print(matchText)
-
-        for m in Matches:
-
-            result = playGame(m.player0, m.player1)
-            RR_Disp.add_record(result, m.player0, m.player1)
-
-            if result == 1:
-                print("player: " + m.player0.name + " won!")
-                m.player0.score += 1
-
-
-            elif result == 0.5:
-                print("Tie!")
-                m.player0.score += 0.5
-                m.player1.score += 0.5
-
-            else:
-                print("player: " + m.player1.name + " won!")
-                m.player1.score += 1
-
-        RR_Disp.printRecord()
-        RR_Disp.printRanking()
-
-    winner = RR_Disp.ranking[0]
-
-    print(winner.name + " WON with the score of " + str(winner.score) + " points!")
 
 ## -------------------------------------------------------------------------- ##
 ##    Utility Function for KO_displayer

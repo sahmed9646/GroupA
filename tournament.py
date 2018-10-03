@@ -1,7 +1,7 @@
 # Standard imports
-import sys
 import random
 from enum import Enum
+import copy
 
 # Project imports
 import console
@@ -319,21 +319,15 @@ class Tournament:
     """
     def startRR(self):
         # Get all combinations for the players/AI. nCr = 28 different combinations
-        players = self.desc.players #all players
+        players = self.desc.players.copy() #all players
 
         RR_Disp = display.RR_displayer_L(players)
 
         for i in range(7):
+
             Matches = []
-            Moving =players[0]
 
-            for j in range(7):
-                posMoveTo = (j+1) % 7
-                nextToMove = players[posMoveTo]
-                players[posMoveTo]= Moving
-                Moving = nextToMove
-
-            print('Round' + str(i) + ' Schedule:')
+            print('Round' + str(i+1) + ' Schedule:'+ '\n')
 
             for k in range(3):
                 player0 = players[k]
@@ -346,16 +340,17 @@ class Tournament:
             player1 = players[7]
             Matches.append(MatchRR(player0, player1))
             matchText = console.coloredText(player0.name,RR_Disp.colorSetting[player0.name]) + ' Vs ' + console.coloredText(player1.name, RR_Disp.colorSetting[player1.name])
-            print(matchText)
+            print(matchText + '\n\n\n\n')
 
 
             for m in Matches:
 
+                print('Next Match : ' + m.player0.name + ' VS ' + m.player1.name)
                 result = playGame(m.player0, m.player1)
                 RR_Disp.add_record(result, m.player0, m.player1)
 
                 if result == 1:
-                    print("player: " + m.player0.name + " won!")
+                    print("Player: " + m.player0.name + " WON!")
                     m.player0.score += 1
 
 
@@ -365,11 +360,19 @@ class Tournament:
                     m.player1.score += 0.5
 
                 else:
-                    print("player: " + m.player1.name + " won!")
+                    print("player: " + m.player1.name + " WON!")
                     m.player1.score += 1
 
-            
+            Moving = players[0]
+            for j in range(7):
+                posMoveTo = (j+1) % 7
+                nextToMove = players[posMoveTo]
+                players[posMoveTo]= Moving
+                Moving = nextToMove
+
+            print('\n\n')
             RR_Disp.printRecord()
+            print("\n\n")
             RR_Disp.printRanking()
 
         
@@ -425,7 +428,7 @@ def platformToTournamentResult(result):
 Plays a random game and returns the score. This is either 1 for win of first player, 0.5 for tie and 0 for loss of first player
 """
 def playGame(player0, player1):
-    result = -1
+    result = 0
 
     # Don't play if both players are AI
     if player0.isAI() and player1.isAI():
