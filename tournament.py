@@ -57,16 +57,16 @@ class TournamentDesc:
             self.type = TournamentType.KNOCKOUT
             self.players = []
             for i in range(4):
-                p = player.Player(ordinalName(i) + "_P", player.PlayerDifficulty.HUMAN)
+                p = player.Player(ordinalName(i) + "_P", player.PlayerDifficulty.human)
                 self.players.append(p)
             for i in range(1):
-                a = player.Player(ordinalName(i) + "_A", player.PlayerDifficulty.EASY)
+                a = player.Player(ordinalName(i) + "_A", player.PlayerDifficulty.easy)
                 self.players.append(a)
             for i in range(1):
-                a = player.Player(ordinalName(i + 1) + "_A", player.PlayerDifficulty.HARD)
+                a = player.Player(ordinalName(i + 1) + "_A", player.PlayerDifficulty.hard)
                 self.players.append(a)
             for i in range(2):
-                a = player.Player(ordinalName(i + 2) + "_A", player.PlayerDifficulty.MEDIUM)
+                a = player.Player(ordinalName(i + 2) + "_A", player.PlayerDifficulty.medium)
                 self.players.append(a)
             return
 
@@ -128,7 +128,7 @@ class TournamentDesc:
                     console.write("Name cannot be empty. Please choose another name")
                     continue
                 if name not in playerNames:
-                    self.players.append(player.Player(name, player.PlayerDifficulty.HUMAN))
+                    self.players.append(player.Player(name, player.PlayerDifficulty.human))
                     playerNames.append(name)
                     validName = True
                 else:
@@ -147,7 +147,7 @@ class TournamentDesc:
             )
             if difficultyChoice == "q":
                 quitProgram()
-            self.players.append(player.Player("AI#" + str(i + 1), player.PlayerDifficulty.EASY if difficultyChoice == "e" else player.PlayerDifficulty.MEDIUM if difficultyChoice == "m" else player.PlayerDifficulty.HARD))
+            self.players.append(player.Player("AI#" + str(i + 1), player.PlayerDifficulty.easy if difficultyChoice == "e" else player.PlayerDifficulty.medium if difficultyChoice == "m" else player.PlayerDifficulty.hard))
 
     """
     Returns a summary of the tournament descriptor
