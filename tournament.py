@@ -57,16 +57,16 @@ class TournamentDesc:
             self.type = TournamentType.KNOCKOUT
             self.players = []
             for i in range(4):
-                p = player.Player(ordinalName(i) + "_P", player.PlayerDifficulty.human)
+                p = player.Player(ordinalName(i) + "_P", player.PlayerDifficulty.HUMAN)
                 self.players.append(p)
             for i in range(1):
-                a = player.Player(ordinalName(i) + "_A", player.PlayerDifficulty.easy)
+                a = player.Player(ordinalName(i) + "_A", player.PlayerDifficulty.EASY)
                 self.players.append(a)
             for i in range(1):
-                a = player.Player(ordinalName(i + 1) + "_A", player.PlayerDifficulty.hard)
+                a = player.Player(ordinalName(i + 1) + "_A", player.PlayerDifficulty.HARD)
                 self.players.append(a)
             for i in range(2):
-                a = player.Player(ordinalName(i + 2) + "_A", player.PlayerDifficulty.medium)
+                a = player.Player(ordinalName(i + 2) + "_A", player.PlayerDifficulty.MEDIUM)
                 self.players.append(a)
             return
 
@@ -128,7 +128,7 @@ class TournamentDesc:
                     console.write("Name cannot be empty. Please choose another name")
                     continue
                 if name not in playerNames:
-                    self.players.append(player.Player(name, player.PlayerDifficulty.human))
+                    self.players.append(player.Player(name, player.PlayerDifficulty.HUMAN))
                     playerNames.append(name)
                     validName = True
                 else:
@@ -147,7 +147,7 @@ class TournamentDesc:
             )
             if difficultyChoice == "q":
                 quitProgram()
-            self.players.append(player.Player("AI#" + str(i + 1), player.PlayerDifficulty.easy if difficultyChoice == "e" else player.PlayerDifficulty.medium if difficultyChoice == "m" else player.PlayerDifficulty.hard))
+            self.players.append(player.Player("AI#" + str(i + 1), player.PlayerDifficulty.EASY if difficultyChoice == "e" else player.PlayerDifficulty.MEDIUM if difficultyChoice == "m" else player.PlayerDifficulty.HARD))
 
     """
     Returns a summary of the tournament descriptor
@@ -424,40 +424,100 @@ def platformToTournamentResult(result):
 
 ## -------------------------------------------------------------------------- ##
 
+def playAIvsAI(player0, player1):
+    # HARD vs EASY
+    if player0.difficulty == player.PlayerDifficulty.HARD and player1.difficulty == player.PlayerDifficulty.EASY:
+        return 1 if random.uniform(0.0, 1.0) < 0.99 else 0
+    # EASY vs HARD
+    if player0.difficulty == player.PlayerDifficulty.EASY and player1.difficulty == player.PlayerDifficulty.HARD:
+        return 1 if random.uniform(0.0, 1.0) >= 0.99 else 0
+    
+    # HARD vs MEDIUM
+    if player0.difficulty == player.PlayerDifficulty.HARD and player1.difficulty == player.PlayerDifficulty.MEDIUM:
+        return 1 if random.uniform(0.0, 1.0) < 0.95 else 0
+    # MEDIUM vs HARD
+    if player0.difficulty == player.PlayerDifficulty.HARD and player1.difficulty == player.PlayerDifficulty.MEDIUM:
+        return 1 if random.uniform(0.0, 1.0) >= 0.95 else 0
+
+    # HARD vs MEDIUM
+    if player0.difficulty == player.PlayerDifficulty.MEDIUM and player1.difficulty == player.PlayerDifficulty.EASY:
+        return 1 if random.uniform(0.0, 1.0) < 0.80 else 0
+    # MEDIUM vs HARD
+    if player0.difficulty == player.PlayerDifficulty.EASY and player1.difficulty == player.PlayerDifficulty.MEDIUM:
+        return 1 if random.uniform(0.0, 1.0) >= 0.80 else 0
+
+    # TIE or 50/50. Same thing as returning tie and then solving with hidden
+    # coin toss. It will be the exact same thing to the user. Just that we skip
+    # the implementation of a tie with ai and tren a totally opqaue coin-toss.
+    return random.choice[0, 1]
+
+## -------------------------------------------------------------------------- ##
+
 """
 Plays a random game and returns the score. This is either 1 for win of first player, 0.5 for tie and 0 for loss of first player
 """
 def playGame(player0, player1):
-    result = 0
+    result = -1
 
-    # Don't play if both players are AI
-    if player0.isAI() and player1.isAI():
-        bag = []
-        for i in range(player0.difficulty.value[0]):
-            bag.append(1)
-        for i in range(player1.difficulty.value[0]):
-            bag.append(0)
-        result = random.choice(bag)
-
-    elif player0.isAI():
-        pass
-        #result = startGame(True, player0.difficulty.value[0])
-        #result = 1.0 - platformToTournamentResult(result)
-    elif player1.isAI():
-        pass
-        #result = startGame(True, player1.difficulty.value[0])
-        #result = platformToTournamentResult(result)
+    # Check if we should flip players to balance colors
+    flip = True if player0.whiteCount > player1.whiteCount else False
+    if flip:
+        player0.blackCount += 1
+        player1.whiteCount += 1
     else:
-        pass
-        #result = startGame(False, 0)
-        #result = platformToTournamentResult(result)
+        player0.whiteCount += 1
+        player1.blackCount += 1
+
+    # Play AI vs AI game
+    if player0.isAI() and player1.isAI():
+        return playAIvsAI(player0, player1)
+
+    # Play player vs player
+    if not player0.isAI() and not player1.isAI():
+        if flip:
+            console.write("Playing game " + player1.name + " vs " + player0.name)
+            pass
+            # result = startGame(0, 0)
+            # result = platformToTournamentResult(result)
+        else:
+            console.write("Playing game " + player0.name + " vs " + player1.name)
+            # result = startGame(0, 0)
+            # result = platformToTournamentResult(result)
+
+    # Play player vs AI
+    if not player0.isAI() and player1.isAI():
+        diffArg = getDifficultyName(player1.difficulty).lower()
+        if flip:
+            console.write("Playing game " + player1.name + " vs " + player0.name)
+            # result = startGame(1, diffArg)
+            # result = platformToTournamentResult(result)
+        else:
+            console.write("Playing game " + player0.name + " vs " + player1.name)
+            # result = startGame(2, diffArg)
+            # result = platformToTournamentResult(result)
+
+    # Play AI vs player
+    if player0.isAI() and not player1.isAI():
+        diffArg = getDifficultyName(player1.difficulty).lower()
+        if flip:
+            console.write("Playing game " + player1.name + " vs " + player0.name)
+            # result = startGame(2, diffArg)
+            # result = platformToTournamentResult(result)
+        else:
+            console.write("Playing game " + player0.name + " vs " + player1.name)
+            # result = startGame(1, diffArg)
+            # result = platformToTournamentResult(result)
+
+    # There should not be another case!
+    else:
+        assert False, "\"SHOULD NEVER HAPPEN\""
 
     # Quit program is result is -1
     if result == -1:
         quitProgram()
 
     #console.write("Playing game: " + player0.name + " vs " + player1.name)
-    return random.choice([0, 0.5, 1])
+    return result
 
 ## -------------------------------------------------------------------------- ##
 ## Demo driver

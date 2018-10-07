@@ -9,19 +9,19 @@ Player difficulty. Human players have the difficulty of 'HUMAN'.
 """
 class PlayerDifficulty(Enum):
     """ Easy sAI """
-    easy = 1,
+    EASY = 1,
     """ Medium AI """
-    medium = 2,
+    MEDIUM = 2,
     """ Hard AI """
-    hard = 3,
+    HARD = 3,
     """ Human player """
-    human = 4
+    HUMAN = 4
     
 
 """
 """
 def getDifficultyName(difficulty):
-    return "Human" if difficulty == PlayerDifficulty.human else "Easy" if difficulty == PlayerDifficulty.easy else "Medium" if difficulty == PlayerDifficulty.medium else "Hard"
+    return "Human" if difficulty == PlayerDifficulty.HUMAN else "Easy" if difficulty == PlayerDifficulty.EASY else "Medium" if difficulty == PlayerDifficulty.MEDIUM else "Hard"
 
 ## -------------------------------------------------------------------------- ##
 ## Player class
@@ -42,4 +42,4 @@ class Player:
         self.tieCount = 0
 
     def isAI(self):
-        return self.difficulty != PlayerDifficulty.human
+        return self.difficulty != PlayerDifficulty.HUMAN
