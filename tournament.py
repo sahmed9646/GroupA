@@ -9,6 +9,9 @@ import display
 import player
 import rps
 
+
+#import platform
+
 ## -------------------------------------------------------------------------- ##
 ## Utility functions
 ## -------------------------------------------------------------------------- ##
@@ -448,7 +451,7 @@ def playAIvsAI(player0, player1):
 
     # TIE or 50/50. Same thing as returning tie and then solving with hidden
     # coin toss. It will be the exact same thing to the user. Just that we skip
-    # the implementation of a tie with ai and tren a totally opqaue coin-toss.
+    # the implementation of a tie with ai and then a totally opqaue coin-toss.
     return random.choice[0, 1]
 
 ## -------------------------------------------------------------------------- ##
@@ -476,37 +479,36 @@ def playGame(player0, player1):
     if not player0.isAI() and not player1.isAI():
         if flip:
             console.write("Playing game " + player1.name + " vs " + player0.name)
-            pass
-            # result = startGame(0, 0)
-            # result = platformToTournamentResult(result)
+            result = startGame(0, 0)
+            result = platformToTournamentResult(result)
         else:
             console.write("Playing game " + player0.name + " vs " + player1.name)
-            # result = startGame(0, 0)
-            # result = platformToTournamentResult(result)
+            result = startGame(0, 0)
+            result = platformToTournamentResult(result)
 
     # Play player vs AI
     if not player0.isAI() and player1.isAI():
         diffArg = getDifficultyName(player1.difficulty).lower()
         if flip:
             console.write("Playing game " + player1.name + " vs " + player0.name)
-            # result = startGame(1, diffArg)
-            # result = platformToTournamentResult(result)
+            result = startGame(1, diffArg)
+            result = platformToTournamentResult(result)
         else:
             console.write("Playing game " + player0.name + " vs " + player1.name)
-            # result = startGame(2, diffArg)
-            # result = platformToTournamentResult(result)
+            result = startGame(2, diffArg)
+            result = platformToTournamentResult(result)
 
     # Play AI vs player
     if player0.isAI() and not player1.isAI():
         diffArg = getDifficultyName(player1.difficulty).lower()
         if flip:
             console.write("Playing game " + player1.name + " vs " + player0.name)
-            # result = startGame(2, diffArg)
-            # result = platformToTournamentResult(result)
+            result = startGame(2, diffArg)
+            result = platformToTournamentResult(result)
         else:
             console.write("Playing game " + player0.name + " vs " + player1.name)
-            # result = startGame(1, diffArg)
-            # result = platformToTournamentResult(result)
+            result = startGame(1, diffArg)
+            result = platformToTournamentResult(result)
 
     # There should not be another case!
     else:
