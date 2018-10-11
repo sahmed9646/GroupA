@@ -479,11 +479,11 @@ def playGame(player0, player1):
     if not player0.isAI() and not player1.isAI():
         if flip:
             console.write("Playing game " + player1.name + " vs " + player0.name)
-            result = startGame(0, 0)
+            result = startGame()
             result = platformToTournamentResult(result)
         else:
             console.write("Playing game " + player0.name + " vs " + player1.name)
-            result = startGame(0, 0)
+            result = startGame()
             result = platformToTournamentResult(result)
 
     # Play player vs AI
