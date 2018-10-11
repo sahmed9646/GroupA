@@ -510,10 +510,6 @@ def playGame(player0, player1):
             result = startGame(1, diffArg)
             result = platformToTournamentResult(result)
 
-    # There should not be another case!
-    else:
-        assert False, "\"SHOULD NEVER HAPPEN\""
-
     # Quit program is result is -1
     if result == -1:
         quitProgram()
