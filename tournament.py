@@ -488,7 +488,7 @@ def playGame(player0, player1):
 
     # Play player vs AI
     if not player0.isAI() and player1.isAI():
-        diffArg = getDifficultyName(player1.difficulty).lower()
+        diffArg = player.getDifficultyName(player1.difficulty).lower()
         if flip:
             console.write("Playing game " + player1.name + " vs " + player0.name)
             result = startGame(1, diffArg)
@@ -500,7 +500,7 @@ def playGame(player0, player1):
 
     # Play AI vs player
     if player0.isAI() and not player1.isAI():
-        diffArg = getDifficultyName(player1.difficulty).lower()
+        diffArg = player.getDifficultyName(player1.difficulty).lower()
         if flip:
             console.write("Playing game " + player1.name + " vs " + player0.name)
             result = startGame(2, diffArg)
